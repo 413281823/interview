@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    .drag {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        color: #fff;
+        text-align: center;
+        line-height: 100px;
+        background: #006eff;
+        user-select: none;
+        cursor: grab;
+    }
+    .drop {
+        position: absolute;
+        top: 0;
+        left: 200px;
+        width: 400px;
+        height: 400px;
+        background: #ececec;
+    }
+
+</style>
+<body>
+<div>
+    <div class="drag" id="dragger" draggable="true"
+         ondragstart="handleDragStart(event)"
+         ondrag="handleDrag(event)"
+         ondragend="handleDragEnd(event)">
+        拖动元素
+    </div>
+    <div class="drop"
+         ondrop="handleDrop(event)"
+         ondragenter="handleDragEnter(event)"
+         ondragover="handleDragOver(event)"
+         ondragleave="handleDragLeave(event)">
+        放置区域
+    </div>
+</div>
+</body>
+<script>
+    var img = new Image();
+    img.src =
+        "https://p6-bd-official.byteimg.com/img/bytedance-cn/4ac74bbefc4455d0b350fff1fcd530c7~noop.image";
+    img.onload = () => {
+        console.log("图片加载成功！");
+    };
+
+    /* 拖拽元素响应事件 */
+    function handleDragStart(e) {
+        console.log(e.dataTransfer);
+        e.dataTransfer.effectAllowed = "move";
+        // e.dataTransfer.setDragImage(img, 0, 0);
+        e.dataTransfer.setData("DRAG_NODE_ID", e.target.id);
+    }
+    function handleDrag(e) {
+        console.log("drag");
+        e.currentTarget.style.opacity = "0";
+    }
+    function handleDragEnd(e) {
+        console.log("dragEnd: 拖动元素被释放");
+        e.currentTarget.style.opacity = "1";
+    }
+
+    /* 放置元素响应事件 */
+    function handleDragEnter(e) {
+        console.log("dragEnter：我到达了一个可释放的区域");
+    }
+    function handleDragOver(e) {
+        // console.log("dragOver");
+
+        e.preventDefault();
+    }
+    function handleDragLeave(e) {
+        console.log("dragLeave：我离开了一个可释放的区域");
+    }
+    function handleDrop(e) {
+        console.log("drop:拖动的过程");
+        e.preventDefault();
+        var data = e.dataTransfer.getData("DRAG_NODE_ID");
+        e.target.appendChild(document.getElementById(data));
+    }
+
+
+</script>
+</html>
