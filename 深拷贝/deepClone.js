@@ -1,23 +1,32 @@
 export function deepClone(source) {
-    let target = {};
+    let target =  Object.create(
+        Object.getPrototypeOf(source)
+    );
     let map = new Map();
     map.set(source, target);
     // 任务队列
     let stack = [{target: target},{source: source}];
     while(stack.length) {
         let {target, source} = stack.pop()
-        for(let property in source)  {
-            if (typeof source[property] === 'object') {
-                if(map.has(source[property])){
-                    target[property] = map.get(source[property])
+        for(let property of Object.getOwnPropertyNames(source))  {
+            let descriptor = Object.getOwnPropertyDescriptor(source, property)
+            if (descriptor.hasOwnProperty("value")){
+                if (typeof source[property] === 'object') {
+                    if(map.has(source[property])){
+                        descriptor.value= map.get(source[property])
+                    } else {
+                        descriptor.value = Object.create(
+                            Object.getPrototypeOf(source[property])
+                        )
+                        map.set(source[property], descriptor.value )
+                        stack.push({target: descriptor.value},{source: source[property]})
+                    }
+                
                 } else {
-                    target[property] = {}
-                    map.set(source[property], target[property])
-                    stack.push({target: target[property]},{source: source[property]})
+                    descriptor.value = source[property]
                 }
-            
             } else {
-                target[property] = source[property]
+                Object.defineProperty(target, property, descriptor)
             }
         }
     }
